@@ -1,156 +1,89 @@
 # DepressionAlert AI
 
-> Final Year Project — COMSATS University Islamabad, Abbottabad Campus
+> Final Year Project — Department of Computer Science
+> COMSATS University Islamabad, Abbottabad Campus
 > BS Computer Science (2023–2027)
->
-> **Team:** Muhammad Salahudin Khan (SP23-BCS-135), Muhammad Azan (SP23-BCS-116)
-> **Supervisor:** Ms. Sara Shafique
+
+**Team:** Muhammad Salahudin Khan (SP23-BCS-135) · Muhammad Azan (SP23-BCS-116)
+**Supervisor:** Ms. Sara Shafique
 
 ---
 
 ## 1. Project Overview
 
-DepressionAlert AI is an intelligent, web-based mental-health monitoring system that detects
-**early signs of depression** by analyzing **user-provided social-media text** with Natural
+DepressionAlert AI is a web-based intelligent mental-health monitoring system that detects
+**early signs of depression** by analyzing **user-provided social-media text** using Natural
 Language Processing (NLP) and Machine Learning (ML).
 
 A registered user submits social-media posts — by **pasting text directly** or by **uploading a
-CSV file** — after granting explicit data-processing consent. The system cleans and tokenizes the
-text, extracts sentiment and linguistic features, runs a trained ML classifier to produce a
-**depression risk score (0–100)** and **risk level (Low / Moderate / High)**, stores the result in
-the user's analysis history, and raises a **high-risk alert with crisis-support resources** when
-the score crosses the configured threshold.
+CSV file** — after granting explicit data-processing consent. The system cleans and tokenizes
+the text, extracts sentiment and linguistic features, and produces a **depression risk score
+(0–100)** with a **risk level (Low / Moderate / High)**. Results are stored in the user's
+analysis history, behavioural trends are tracked over time, and a **high-risk alert with
+crisis-support resources** is raised when the score crosses the configured threshold.
 
-The system is **strictly permission-based**: no data is collected automatically, and all
-monitoring begins only after explicit user consent. It provides **supportive early-awareness
-insight only — it is not a diagnostic or clinical tool**, and all outputs are advisory.
-
-**Project category:** Web Application / Information System + Artificial Intelligence & Machine Learning
-
-### Source documents (single source of truth)
-
-| Document | File | Contents |
-|---|---|---|
-| Project Proposal | `DepalertAi.pdf` | Vision, problem statement, scope, 9 system modules, tools & technologies, WBS |
-| SRS (30%) | `SRS_DepressionAlertAI 30 %.pdf` | 8 use cases, FR-1..FR-14, quality attributes, external interfaces, constraints |
-| SDD | `SDD_DepressionAlert_AI.pdf` | 3-tier architecture, 6 core modules, data dictionary, algorithms (PDL), screen designs |
-
-Plain-text extracts for quick grepping live in `docs/extracted-text/`.
-A condensed requirements reference for implementation prompts lives in
-`PROJECT_REQUIREMENTS.txt`.
+The system is **strictly permission-based**: nothing is collected automatically and analysis
+begins only after explicit consent, which can be revoked at any time. All outputs are
+**advisory early-awareness insights only — the system is not a diagnostic or clinical tool**.
 
 ---
 
-## 2. Requirements Extracted from the PDFs
+## 2. Project Objectives
 
-### 2.1 Functional Requirements (SRS §4)
+- Provide an accessible, consent-driven tool for early awareness of depression-related
+  language patterns in user-submitted text.
+- Apply NLP preprocessing (cleaning, tokenization, stop-word removal) and sentiment /
+  linguistic feature extraction to each submission.
+- Generate a traceable depression risk score and risk level per analysis.
+- Maintain rolling behavioural-pattern averages (first-person pronoun density, absolutist
+  language, negative-emotion word frequency) across submissions.
+- Automatically generate high-risk alerts paired with crisis-support resources.
+- Guarantee per-user data isolation, secure authentication, and revocable consent.
 
-| ID | Requirement |
+---
+
+## 3. Key Features
+
+| Feature | Description |
 |---|---|
-| FR-1 | User registration with name, email, password |
-| FR-2 | User login / authentication before protected features |
-| FR-3 | Verify data-processing consent before accepting/processing text (revocable) |
-| FR-4 | Manual text submission (paste social-media post text) |
-| FR-5 | CSV file upload for batch analysis of multiple posts |
-| FR-6 | Submission validation — reject empty, malformed, invalid, duplicate records |
-| FR-7 | Text preprocessing — remove symbols, stop words, irrelevant characters |
-| FR-8 | Tokenization + sentiment, emotional and linguistic feature extraction |
-| FR-9 | Trained ML model generates risk score + risk level per analysis |
-| FR-10 | Behavioral trend analysis — compare current vs previous results over time |
-| FR-11 | Threshold-based alerting — auto-generate + store high-risk alert |
-| FR-12 | Crisis-support resources displayed whenever a high-risk alert fires |
-| FR-13 | Dashboard shows latest risk score, risk level, alert status, analysis options |
-| FR-14 | Analysis history — date, risk score, risk level, sentiment result per record |
-
-### 2.2 Use Cases (SRS §3)
-
-- **UC-1** Register Account · **UC-2** Login · **UC-3** View Dashboard
-- **UC-4** Get Depression Evaluation (paste text or upload CSV → NLP → risk score)
-- **UC-5** View Risk Score (latest score + Low/Moderate/High + brief explanation)
-- **UC-6** View Analysis History (records by date, selectable detail)
-- **UC-7** View Behavioral Trends (charts + summaries of changes)
-- **UC-8** Receive High-Risk Alert & Crisis Support (threshold breach → alert → helplines/resources → view or dismiss)
-
-### 2.3 Six Core Modules (SDD §1, §3)
-
-1. **Data Collection Module** — `validateAndStorePost()`: consent check, manual/CSV ingest, dedupe/validation, persist `Post`.
-2. **NLP Processing Module** — `preprocessText()`: clean, lowercase, tokenize, remove stop words, sentiment score, feature vector → `ProcessedText`.
-3. **Depression Detection Module** — `computeRiskScore()`: trained classifier → `risk_score` 0–100 → `risk_level` (≥70 High, ≥40 Moderate, else Low) → `AnalysisResult`.
-4. **Behavioral Analysis Module** — `updateBehavioralPattern()`: rolling per-user linguistic markers (first-person pronoun density, absolutist language, negative-emotion word frequency) → `BehavioralPattern`.
-5. **Alert System Module** — `evaluateAndGenerateAlert()`: High risk → `Alert` (status New → Viewed/Dismissed) + user notification.
-6. **Dashboard Module** — aggregated view of results, trends, alerts for the user.
-
-### 2.4 Quality Attributes (SRS §5)
-
-- **Usability:** submit text within ≤3 interactions from Dashboard (USE-1); dashboard shows score/level/alert/trend summary on one page (USE-2); clear labels + validation feedback (USE-3); responsive on desktop/laptop/tablet/phone (USE-4); consistent navigation (USE-5).
-- **Performance:** single-text risk score within 5 s (PER-1); 95% of dashboard loads < 3 s on ≥10 Mbps (PER-2); CSV upload acknowledged < 3 s with processing status (PER-3); concurrent users without degradation (PER-4).
-- **Security & privacy:** HTTPS/TLS 1.2+ everywhere (SEC-1); consent-based, revocable processing (SEC-2); salted one-way password hashing (SEC-3); auth required for all protected features (SEC-4); per-user data isolation (SEC-5); secure CSV validation — format/size/malformed/unsafe (SEC-6); secure session termination + invalid-token rejection (SEC-7).
-
-### 2.5 Operating Environment & Constraints (SRS §2)
-
-- Browsers: current Chrome, Firefox, Edge — desktop **and** mobile.
-- Server: Linux environment; **Node.js 20.x LTS** and **Python 3.11**.
-- CO-1: Frontend = **React 18.x**. CO-2: Backend API = **Node.js/Express**; AI/NLP/ML = **Python 3.11 + scikit-learn + spaCy/NLTK**. CO-3: model trained on publicly available, ethically sourced mental-health text datasets.
-
-### 2.6 Explicit Exclusions (Proposal §6)
-
-No clinical diagnosis, no automated contact with monitored individuals, no image/video
-analysis, no suicide-risk prediction, no biometric/wearable data, no treatment
-recommendations.
-
-> **Scope note:** the Proposal describes a broad long-term vision (direct social-media APIs,
-> professional/clinician roles, admin console, multi-language, GDPR/HIPAA, EMR/HL7-FHIR export).
-> The **SRS + SDD define the FYP build scope**: a consent-based, user-facing web app with manual
-> paste + CSV submission and the six modules above. This scaffold implements the SRS/SDD scope;
-> Proposal-only items are documented as future work, not built.
+| **User registration & login** | Secure account creation and JWT-based sessions |
+| **Consent enforcement** | Text is processed only while consent is granted; revocable anytime |
+| **Manual text submission** | Paste a post, comment, or journal entry for instant evaluation |
+| **CSV batch upload** | Upload a `.csv` of posts; empty, malformed and duplicate rows are rejected |
+| **Risk scoring** | 0–100 score classified as Low (<40), Moderate (40–69), High (≥70) |
+| **Linguistic markers** | First-person pronoun density, absolutist language, negative-emotion words |
+| **Analysis history** | Every result with date, score, level, sentiment, and source |
+| **Behavioural trends** | Charts and summaries of score, sentiment and marker changes over time |
+| **High-risk alerts** | Non-alarming modal + alert list; status lifecycle New → Viewed / Dismissed |
+| **Crisis support** | Helplines, emergency contacts, breathing exercises, learning library |
+| **Live monitor feed** | Dashboard notifications derived from the user's recent analyses |
+| **Preventive actions** | Mute keywords, feed filter, scheduled nightly pause, 30-min detox timer |
+| **Authorized Viewer role** | Read-only access to authorized users' results (e.g. a counselor) |
+| **Privacy & profile** | Account management, password change, consent grant/revoke |
 
 ---
 
-## 3. Technology Stack
+## 4. System Architecture
 
-Strictly the technologies named in the PDFs:
-
-| Layer | Technology | Source |
-|---|---|---|
-| **Frontend** | React 18.x (SPA), HTML, CSS, JavaScript | SRS CO-1; Proposal §9 |
-| **Backend API** | Node.js 20.x LTS, Express.js — REST + JSON | SRS CO-2, §6.2; Proposal §9 |
-| **ML/NLP service** | Python 3.11, scikit-learn, spaCy, NLTK | SRS CO-2, §6.2 |
-| **Database** | **MongoDB** | Proposal §9 (Tools & Technologies) |
-| **Auth** | JWT-based session tokens | Proposal §7.1; SRS SEC-4/7 |
-| **Comms** | HTTPS/TLS 1.2+, RESTful JSON, multipart CSV upload | SRS §6.4 |
-| **Tools** | GitHub (version control), Postman (API testing) | Proposal §9 |
-
-Supporting npm packages (`mongoose`, `jsonwebtoken`, `bcryptjs`, `multer`, `cors`, `dotenv`,
-`react-router-dom`, `vite`) are implementation plumbing for the named technologies above, not new
-stack choices.
-
-> **Database discrepancy (documented for honesty):** the SDD's data dictionary is written
-> generically ("relational database, e.g. PostgreSQL/MySQL", integer PKs). The **Proposal names
-> MongoDB**, and the project plan phases in "MongoDB Integration" — so MongoDB is the database.
-> In Mongoose the integer PKs map to MongoDB `_id` / ObjectId references; attributes and enums are
-> unchanged.
-
----
-
-## 4. Project Architecture
-
-Three-tier client–server system (SDD §3), six modules in the application tier:
+Three-tier client–server architecture:
 
 ```
 ┌──────────────────────────┐   REST/JSON (HTTPS)   ┌───────────────────────────────┐
 │  CLIENT TIER             │ ◄──────────────────► │  APPLICATION TIER             │
-│  React 18 SPA            │                       │  Node.js 20 + Express API     │
-│  Dashboard · Daily Log · │   multipart CSV      │  ├─ Auth (JWT)                 │
-│  Sentiment Alert ·       │ ───────────────────► │  ├─ Data Collection Module    │
-│  Crisis Support ·        │                       │  ├─ Alert System Module       │
-│  History · Trends ·      │                       │  ├─ Behavioral Analysis Mod.  │
+│  React 18 SPA            │                       │  Node.js + Express API        │
+│  Dashboard · Daily Log · │   multipart CSV      │  ├─ Auth (JWT, bcrypt)        │
+│  Analysis · History ·    │ ───────────────────► │  ├─ Data Collection Module    │
+│  Trends · Alerts ·       │                       │  ├─ Alert System Module       │
+│  Crisis Support ·        │                       │  ├─ Behavioral Analysis Mod.  │
 │  Privacy/Profile         │                       │  ├─ Dashboard aggregation     │
 └──────────────────────────┘                       │  └─ ML-service client         │
                                                    └───────────┬───────────────────┘
                                                                │ protected internal API
+                                                               │ (X-API-Key)
                                                    ┌───────────▼───────────────────┐
-                                                   │  Python 3.11 service          │
+                                                   │  Python service (FastAPI)     │
                                                    │  scikit-learn · spaCy · NLTK  │
+                                                   │  Groq LLM risk scorer         │
                                                    │  ├─ NLP Processing Module     │
                                                    │  └─ Depression Detection Mod. │
                                                    └───────────┬───────────────────┘
@@ -163,186 +96,429 @@ Three-tier client–server system (SDD §3), six modules in the application tier
                                                    └───────────────────────────────┘
 ```
 
-**Pipeline flow (SDD §3.2):** consent → submit text/CSV → validate & store `Post` →
-preprocess/extract → `ProcessedText` → classifier → `AnalysisResult` (score + level) →
-update `BehavioralPattern` → if High, create `Alert` + notify → dashboard reflects result.
+**Pipeline flow:** consent → submit text/CSV → validate & store `Post` → preprocess/extract →
+`ProcessedText` → classify → `AnalysisResult` (score + level) → update `BehavioralPattern` →
+if High, create `Alert` + notify → dashboard reflects the result.
+
+### Six core modules
+
+1. **Data Collection** — `validateAndStorePost()`: consent check, manual/CSV ingest,
+   deduplication and validation, `Post` persistence.
+2. **NLP Processing** — `preprocessText()`: symbol/URL removal, lowercasing, tokenization,
+   stop-word removal, sentiment score, feature vector → `ProcessedText`.
+3. **Depression Detection** — `computeRiskScore()`: classifier → `risk_score` (0–100) →
+   `risk_level` (≥70 High, ≥40 Moderate, else Low) → `AnalysisResult`.
+4. **Behavioral Analysis** — `updateBehavioralPattern()`: rolling per-user linguistic-marker
+   averages → `BehavioralPattern`.
+5. **Alert System** — `evaluateAndGenerateAlert()`: High risk → `Alert` (status New) +
+   in-app notification.
+6. **Dashboard** — aggregated view of results, trends and alerts.
 
 ---
 
-## 5. Folder Structure
+## 5. Technologies and Tools Used
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 (Vite), React Router 6, HTML, CSS, JavaScript (ES modules) |
+| Backend API | Node.js (20.x LTS), Express 4 — REST + JSON |
+| ML/NLP service | Python 3.11+, FastAPI, scikit-learn, spaCy, NLTK |
+| Risk classifier | Groq-hosted LLM (`openai/gpt-oss-120b`, OpenAI-compatible API) with a local scikit-learn/heuristic fallback |
+| Database | MongoDB (Atlas) via Mongoose 8 |
+| Authentication | JWT session tokens, bcrypt salted password hashing |
+| File upload | Multer (multipart/form-data, CSV only) |
+| Tools | GitHub (version control), Postman (API testing) |
+
+---
+
+## 6. Frontend Overview
+
+Single-page React application with a calm, card-based, responsive UI (desktop, tablet and
+mobile). All protected routes require an authenticated session; a left sidebar provides
+consistent navigation.
+
+| Route | Page | Functionality |
+|---|---|---|
+| `/` | Landing + public pages | About, Contact, Help, Terms, Privacy Policy, Onboarding |
+| `/register` | Registration | Name, email, password, explicit consent checkbox, inline validation |
+| `/login` | Login | Email + password, demo-account hints, error feedback |
+| `/forgot-password` `/reset-password` | Password reset | Request reset code → set new password |
+| `/dashboard` | Dashboard | Digital Sentiment Score gauge, 7-day usage-vs-mood chart, mood-by-platform breakdown, preventive-action shortcuts, live sentiment-monitor feed, quick actions |
+| `/daily-log` | Depression Evaluation | Paste text or upload CSV; linguistic-marker panel; Sentiment Volatility timeline; Post & Comment Deep Dive (Social Feed / Direct Messages toggle) |
+| `/analysis-result`, `/analysis/:id` | Analysis Result | Risk gauge, level badge, sentiment, detected indicators, plain-language explanation |
+| `/history` | Analysis History | Filterable table of all results (date, excerpt, source, sentiment, score, level) |
+| `/trends` | Behavioural Trends | Risk-score and sentiment charts, marker trends, change summary |
+| `/alerts` | Alerts | High-risk alert list with View result / Resources / Mark viewed / Dismiss |
+| `/crisis-support` | Crisis Support | Helplines, immediate steps, coping toolkit, learning library |
+| `/detox` | 30-min Detox | Guided countdown timer logged against the active alert |
+| `/privacy` | Privacy & Profile | Profile edit, password change, consent grant/revoke, data-rights info |
+| `/settings` | Settings | Mute Keywords, Enable Feed Filter, Schedule Nightly Pause |
+| `/viewer`, `/viewer/users/:id` | Authorized Viewer | Read-only caseload: latest score, trajectory, recent results |
+
+The **Sentiment Alert modal** appears after a high-risk submission with a non-alarming
+explanation and three actions: *Take a 30-min break* (status → Viewed), *View crisis-support
+resources* (→ Viewed), *Dismiss* (→ Dismissed).
+
+The frontend communicates with the backend exclusively through `src/services/api.js`, which
+attaches the JWT as a `Bearer` token and maps each function to a REST endpoint under
+`VITE_API_BASE_URL`.
+
+---
+
+## 7. Backend Overview
+
+Node.js/Express REST API implementing all SRS interfaces. Layered structure:
+routes → middleware → controllers → services → models.
+
+### 7.1 Middleware
+
+| Middleware | Responsibility |
+|---|---|
+| `auth.middleware.js` | Verifies `Authorization: Bearer <jwt>`; rejects expired/invalid tokens; loads the user; `requireRole()` for role-gated routes |
+| `consent.middleware.js` | Blocks text/CSV processing unless `consentGiven` is true — returns `403 "Consent required"` |
+| `upload.middleware.js` | Multer disk storage to `uploads/`, `.csv` extension + MIME filter, size limit |
+| `errorHandler.middleware.js` | `ApiError` class; consistent `{ message }` JSON errors; handles Multer/Mongoose/duplicate-key errors |
+
+### 7.2 Services
+
+| Service | Responsibility |
+|---|---|
+| `pipeline.service.js` | Orchestrates the six-module pipeline: Post → ML service → ProcessedText → AnalysisResult → BehavioralPattern → Alert |
+| `mlService.service.js` | Client for the protected internal Python service (`X-API-Key`, 15 s timeout, retryable 502 on failure); single + batch analysis |
+| `alert.service.js` | `evaluateAndGenerateAlert()` — creates an `Alert` (status `New`) when risk level is High |
+| `behavioralAnalysis.service.js` | `updateBehavioralPattern()` — rolling per-user averages of the three linguistic markers |
+
+### 7.3 Utilities
+
+- `csvValidator.js` — RFC-4180-style CSV parser (quoted cells, embedded commas/newlines),
+  header detection (`text`/`post`/`content`/`message` column), empty/oversized/duplicate
+  row rejection (within the file and against the user's existing posts).
+- `riskLevel.js` — score → level mapping (≥70 High, ≥40 Moderate, else Low).
+- `serializers.js` — document → client DTOs matching the frontend's expected shapes.
+
+### 7.4 Authentication & sessions
+
+- Registration validates name/email/password, hashes the password with **bcrypt** (salted,
+  one-way) and returns a signed **JWT** (`sub` = user id, configurable expiry).
+- Login verifies credentials and issues a session token; every protected endpoint re-loads
+  the user from the database so role/consent changes take effect immediately.
+- Password change requires the current password; password reset issues a time-limited token
+  (returned in the response in development mode, since email delivery is out of scope).
+
+### 7.5 API reference
+
+All endpoints are under `/api`. All except `/api/auth/*` and `/api/health` require a Bearer token.
+
+| Method & Path | Description |
+|---|---|
+| `POST /api/auth/register` | Create account `{name, email, password, consent}` → `{token, user}` |
+| `POST /api/auth/login` | `{email, password}` → `{token, user}` |
+| `POST /api/auth/logout` | Session termination (client discards token) |
+| `POST /api/auth/forgot-password` | `{email}` → issues reset token |
+| `POST /api/auth/reset-password` | `{token, password}` → resets password |
+| `GET /api/users/me` | Current profile |
+| `PATCH /api/users/me` | Update name/email |
+| `PATCH /api/users/me/password` | Change password `{current, next}` |
+| `PUT /api/users/me/consent` | Grant/revoke consent `{consentGiven}` (audit-logged) |
+| `GET` · `PATCH /api/users/me/settings` | Preventive-action settings (mute keywords, feed filter, nightly pause) |
+| `POST /api/users/me/activity` | Log a preventive action (e.g. detox) |
+| `GET /api/users/viewer/cases` | Authorized Viewer caseload *(Authorized Viewer role)* |
+| `GET /api/users/viewer/cases/:id` | Read-only case detail *(Authorized Viewer role)* |
+| `POST /api/submissions/text` | `{text}` → `{analysis, alert}` *(consent required)* |
+| `POST /api/submissions/csv` | multipart `file` → `{results, skipped, alert}` *(consent required)* |
+| `GET /api/submissions/posts` | User's stored posts (deep-dive panel) |
+| `GET /api/analysis/latest` | Latest result or `null` |
+| `GET /api/analysis/history` | All results, newest first |
+| `GET /api/analysis/:id` | Single result detail |
+| `GET /api/trends` | Points, markers, rolling averages, change summary |
+| `GET /api/alerts` | User's alerts, newest first |
+| `PATCH /api/alerts/:id` | `{status: New\|Viewed\|Dismissed}` |
+| `GET /api/crisis-support` | Helplines, toolkit, articles |
+| `GET /api/dashboard/monitor` | Live sentiment-monitor feed derived from user data |
+| `GET /api/dashboard/summary` | Aggregated latest result, totals, alerts, rolling averages |
+
+### 7.6 ML service (Python)
+
+Protected internal FastAPI service — reachable only by the backend via `X-API-Key`.
+Performs text cleaning, tokenization, stop-word removal, sentiment analysis, linguistic
+feature extraction and depression-risk scoring.
+
+| Endpoint | Description |
+|---|---|
+| `GET /health` | Service + model status |
+| `POST /analyze` | `{text}` → cleaned text, tokens, sentiment, markers, indicators, feature vector, risk score/level, model version |
+| `POST /analyze/batch` | `{texts[]}` → array of results (CSV path) |
+| `POST /patterns/rolling` | `{markers[]}` → rolling averages |
+
+**Scoring order:** Groq LLM (`openai/gpt-oss-120b`, strict-JSON response) → trained
+scikit-learn artifact (`app/models/artifacts/<MODEL_VERSION>.joblib`) → deterministic
+lexicon-based heuristic. The effective scorer is recorded on every `AnalysisResult` as
+`modelVersion` for traceability.
+
+---
+
+## 8. Database / MongoDB Integration
+
+MongoDB is accessed through Mongoose. Six collections map to the SDD data dictionary;
+integer PKs map to `_id`/ObjectId references.
+
+| Collection | Fields |
+|---|---|
+| `users` | `name`, `email` (unique), `passwordHash` (bcrypt, never returned), `consentGiven`, `role` (`Standard`/`Authorized Viewer`), `settings`, `consentLog`, `activityLog`, `authorizedCases`, `createdAt` |
+| `posts` | `userId` → User, `content`, `source` (`Manual`/`CSV`), `kind`, `platform`, `submittedAt` |
+| `processedtexts` | `postId` → Post, `userId` → User, `cleanedText`, `tokens[]`, `sentimentScore` (−1..1), `markers`, `indicators[]`, `featureVector[]` |
+| `analysisresults` | `processedTextId` → ProcessedText, `postId` → Post, `userId` → User, `riskScore` (0–100), `riskLevel` (`Low`/`Moderate`/`High`), `modelVersion`, `analyzedAt` |
+| `behavioralpatterns` | `userId` → User (unique), `windowStart`, `windowEnd`, `firstPersonDensity`, `absolutistLanguage`, `negativeEmotionWords`, `analysisCount` |
+| `alerts` | `analysisResultId` → AnalysisResult, `userId` → User, `message`, `status` (`New`/`Viewed`/`Dismissed`), `channel`, `createdAt` |
+
+Every query is scoped by `userId`, so users can only ever read their own data.
+Uploaded CSV files are held temporarily in `uploads/` and deleted after their rows are
+persisted — raw files are never retained.
+
+---
+
+## 9. Project Structure
 
 ```
 .
-├── DepalertAi.pdf                     # Project Proposal (source of truth)
-├── SRS_DepressionAlertAI 30 %.pdf     # SRS (source of truth)
-├── SDD_DepressionAlert_AI.pdf         # SDD (source of truth)
-├── PROJECT_REQUIREMENTS.txt           # Condensed requirements reference
-├── README.md
-├── docs/extracted-text/               # Plain-text extracts of the 3 PDFs
+├── backend/                          # Node.js/Express REST API
+│   ├── package.json  .env.example
+│   ├── uploads/                      # temporary CSV files (discarded after parse)
+│   └── src/
+│       ├── index.js                  # entry point — connect DB, start server
+│       ├── app.js                    # Express app assembly
+│       ├── seed.js                   # demo accounts + sample history (npm run seed)
+│       ├── e2e.test.mjs              # end-to-end API verification
+│       ├── config/                   # env.js, db.js
+│       ├── models/                   # User, Post, ProcessedText, AnalysisResult,
+│       │                             #   BehavioralPattern, Alert
+│       ├── routes/                   # auth, user, submission, analysis, trend,
+│       │                             #   alert, crisisSupport, dashboard
+│       ├── controllers/              # one per route module
+│       ├── middleware/               # auth (JWT), consent, upload (CSV), errors
+│       ├── services/                 # pipeline, mlService client, alert,
+│       │                             #   behavioralAnalysis
+│       ├── utils/                    # csvValidator, riskLevel, serializers
+│       └── data/                     # crisisResources
 │
-├── frontend/                          # React 18 SPA (Phase 1)
+├── frontend/                         # React 18 SPA
 │   ├── index.html  vite.config.js  package.json  .env.example
 │   ├── public/
 │   └── src/
 │       ├── main.jsx  App.jsx  index.css
-│       ├── routes/AppRoutes.jsx       # route table (public + protected)
-│       ├── context/AuthContext.jsx    # JWT session state (FR-2, SEC-4/7)
-│       ├── services/api.js            # REST client -> backend
-│       ├── components/
-│       │   ├── layout/                # AppLayout, Sidebar (Dashboard, Daily Log,
-│       │   │                          #   Privacy, Crisis Support — SDD §8)
-│       │   ├── alerts/                # SentimentAlertModal (Take 30-min break /
-│       │   │                          #   Dismiss → Viewed / Dismissed)
-│       │   ├── charts/                # trend + volatility visualizations
-│       │   └── common/
-│       ├── pages/
-│       │   ├── auth/                  # LoginPage, RegisterPage
-│       │   ├── dashboard/             # DashboardPage
-│       │   ├── daily-log/             # DailyLogPage (Depression Evaluation)
-│       │   ├── analysis-result/       # AnalysisResultPage (View Risk Score)
-│       │   ├── analysis-history/      # AnalysisHistoryPage
-│       │   ├── behavioral-trends/     # BehavioralTrendsPage
-│       │   ├── crisis-support/        # CrisisSupportPage
-│       │   └── privacy/               # PrivacyProfilePage (consent mgmt)
-│       ├── hooks/  utils/  assets/
+│       ├── routes/                   # AppRoutes, ProtectedRoute
+│       ├── context/                  # AuthContext, AppDataContext, ToastContext
+│       ├── services/api.js           # REST client -> backend
+│       ├── components/               # layout, alerts, charts, common
+│       ├── pages/                    # auth, dashboard, daily-log, analysis-result,
+│       │                             #   analysis-history, behavioral-trends,
+│       │                             #   alerts, crisis-support, privacy,
+│       │                             #   settings, viewer, public
+│       ├── utils/  hooks/  assets/
 │
-├── backend/                           # Node.js/Express API (Phase 2)
-│   ├── package.json  .env.example
-│   ├── uploads/                       # temp CSV files (discarded after parse — SDD §5)
-│   └── src/
-│       ├── index.js  app.js
-│       ├── config/                    # env.js, db.js (MongoDB — Phase 3)
-│       ├── models/                    # User, Post, ProcessedText, AnalysisResult,
-│       │                              #   BehavioralPattern, Alert  (SDD §5.1)
-│       ├── routes/                    # auth, user, submission, analysis, trend,
-│       │                              #   alert, crisisSupport
-│       ├── controllers/               # one per route module
-│       ├── middleware/                # auth (JWT), consent, upload (CSV), errors
-│       ├── services/                  # mlService client, alert, behavioralAnalysis
-│       └── utils/                     # csvValidator, riskLevel
-│
-└── ml-service/                        # Python 3.11 NLP/ML service (Phase 2)
+└── ml-service/                       # Python NLP/ML service
     ├── requirements.txt  .env.example
     ├── tests/
     └── app/
-        ├── main.py                    # protected internal API (SRS §6.2)
-        ├── preprocessing/             # text_cleaner, tokenizer
-        ├── features/                  # sentiment, linguistic_features
-        ├── detection/                 # model_loader, risk_scorer
-        ├── behavioral/                # pattern_analyzer
-        └── models/artifacts/          # trained model files (MODEL_VERSION)
+        ├── main.py                   # protected internal API
+        ├── config.py
+        ├── preprocessing/            # text_cleaner, tokenizer
+        ├── features/                 # sentiment, linguistic_features
+        ├── detection/                # groq_scorer, model_loader, risk_scorer
+        ├── behavioral/               # pattern_analyzer
+        └── models/artifacts/         # trained model files (MODEL_VERSION)
 ```
 
 ---
 
-## 6. Required Pages / Interfaces
+## 10. Environment Variables / Configuration
 
-Nine interfaces (SRS §6.1) plus the alert modal (SDD §8.1.3):
+Copy each `.env.example` to `.env` in the same folder and fill in the values.
+`.env` is git-ignored — never commit credentials.
 
-| # | Interface | Route (planned) | Key contents |
-|---|---|---|---|
-| 1 | Registration | `/register` | name, email, password; validation errors → Login |
-| 2 | Login | `/login` | email, password → Dashboard |
-| 3 | Dashboard | `/` | Digital Sentiment Score, 7-day usage-vs-mood chart, mood-by-platform breakdown, preventive actions (Mute Keywords, Feed Filter, Nightly Pause, START 30-MIN DETOX), live sentiment-monitor feed; options: Get Evaluation / Risk Score / History / Trends |
-| 4 | Daily Log — Depression Evaluation | `/daily-log` | paste text OR upload CSV; linguistic-marker panel; Sentiment Volatility timeline; Post & Comment Deep Dive (Social Feed / Direct Messages toggle) |
-| 5 | Analysis Result | `/analysis-result` | latest risk score, Low/Moderate/High level, sentiment, indicators, brief explanation |
-| 6 | Analysis History | `/history` | records by date: date, score, level, sentiment; record detail |
-| 7 | Behavioural Trends | `/trends` | charts + summaries of risk/sentiment/emotion changes |
-| 8 | Crisis Support & Resources | `/crisis-support` | helplines, emergency contacts, breathing exercises (START SESSION), guided meditation (OPEN), mood-boost audio (OPEN PLAYLIST), learning library |
-| 9 | Privacy & Profile | `/privacy` | privacy info, grant/revoke consent, account details |
-| — | Sentiment Alert (modal) | overlay | non-alarming explanation; "Take a 30-min break" → Viewed, "Dismiss" → Dismissed |
+### `backend/.env`
 
----
+| Variable | Purpose | Example |
+|---|---|---|
+| `NODE_ENV` | Runtime environment | `development` |
+| `PORT` | API port | `5000` |
+| `CLIENT_URL` | Allowed frontend origin (CORS) | `http://localhost:5173` |
+| `MONGODB_URI` | MongoDB connection string (local or Atlas) | `mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/depressionalert_ai` |
+| `JWT_SECRET` | Session-token signing secret | *(long random string)* |
+| `JWT_EXPIRES_IN` | Token lifetime | `1d` |
+| `ML_SERVICE_URL` | Internal Python service URL | `http://localhost:8000` |
+| `ML_SERVICE_API_KEY` | Shared key the backend presents to the ML service | *(random string)* |
+| `HIGH_RISK_THRESHOLD` | Score triggering a High alert | `70` |
+| `MAX_CSV_FILE_SIZE_MB` | CSV upload size limit | `5` |
+| `CSV_UPLOAD_DIR` | Temporary upload directory | `uploads` |
 
-## 7. Development Phases
+### `frontend/.env`
 
-### Phase 1 — Frontend (next prompt)
+| Variable | Purpose | Example |
+|---|---|---|
+| `VITE_API_BASE_URL` | Backend REST base URL | `http://localhost:5000/api` |
 
-Build the complete React 18 UI: all 9 interfaces + Sentiment Alert modal, sidebar layout,
-routing with protected routes, auth context, API client, form validation states, empty/error
-states, color-coded risk indicators, and all SDD screen objects/actions — consistent, calm,
-responsive design (USE-1..5). Backend responses may be mocked until Phase 2.
+### `ml-service/.env`
 
-### Phase 2 — Backend
-
-Implement the Express REST API (all SRS §6.2 interfaces), JWT auth, consent enforcement,
-submission validation, CSV handling, the six-module pipeline, and the internal Python service
-(text cleaning → features → risk score → behavioral patterns). CSV files are temporary and
-deleted after rows are persisted (SDD §5).
-
-### Phase 3 — MongoDB Integration
-
-Connect via Mongoose (`MONGODB_URI`); implement the six entities from the SDD data
-dictionary; enforce per-user data isolation (`user_id` scoping, SEC-5); salted password
-hashing (SEC-3); `model_version` stored on every `AnalysisResult` for traceability.
+| Variable | Purpose | Example |
+|---|---|---|
+| `ML_SERVICE_PORT` | Service port | `8000` |
+| `ML_SERVICE_API_KEY` | Must match the backend value | *(same random string)* |
+| `MODEL_VERSION` | Model artifact identifier | `v1.0.0` |
+| `GROQ_API_KEY` | Groq API key for LLM risk scoring (empty → local fallback) | `gsk_...` |
+| `GROQ_MODEL` | Groq model id | `openai/gpt-oss-120b` |
 
 ---
 
-## 8. Environment Variables
+## 11. How to Run
 
-Copy each `.env.example` to `.env` and fill values. `.env` is gitignored — never commit secrets.
+### Prerequisites
 
-**`backend/.env`**
+- **Node.js 20.x LTS** (or newer) and npm
+- **Python 3.11+** with pip
+- A **MongoDB** connection string — a free MongoDB Atlas M0 cluster or a local `mongod`
 
-| Variable | Purpose |
-|---|---|
-| `NODE_ENV` / `PORT` | Runtime env / API port (default 5000) |
-| `CLIENT_URL` | Frontend origin for CORS |
-| `MONGODB_URI` | MongoDB connection string (local or Atlas free tier) |
-| `JWT_SECRET` / `JWT_EXPIRES_IN` | Session-token signing / lifetime (SEC-4, SEC-7) |
-| `ML_SERVICE_URL` / `ML_SERVICE_API_KEY` | Protected internal Python service (SRS §6.2) |
-| `HIGH_RISK_THRESHOLD` | Score (0–100) that triggers a High alert — default 70 (SDD §6.3) |
-| `MAX_CSV_FILE_SIZE_MB` / `CSV_UPLOAD_DIR` | Secure CSV upload limits (SEC-6) |
-
-**`frontend/.env`**: `VITE_API_BASE_URL` — backend REST base URL.
-**`ml-service/.env`**: `ML_SERVICE_PORT`, `ML_SERVICE_API_KEY`, `MODEL_VERSION`.
-
----
-
-## 9. Setup Instructions
+### 1) Configure environment files
 
 ```bash
-# Frontend (React 18)
-cd frontend && npm install && cp .env.example .env && npm run dev     # :5173
-
-# Backend (Node 20 LTS)
-cd backend && npm install && cp .env.example .env && npm run dev      # :5000
-
-# ML service (Python 3.11)
-cd ml-service && python -m venv .venv && .venv\Scripts\activate       # Windows
-pip install -r requirements.txt && cp .env.example .env
-
-# MongoDB (Phase 3): local mongod, or a free MongoDB Atlas M0 cluster
-# -> paste the connection string into backend/.env MONGODB_URI
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+cp ml-service/.env.example ml-service/.env
 ```
 
-Scaffold note: backend `routes/`, `controllers/`, `models/` and `ml-service/` files are
-**intentional stubs** annotated with their source requirement. The **frontend is fully
-implemented** (Phase 1 complete) with a mock API layer in `frontend/src/services/` that Phase 2
-replaces with real `fetch()` calls to `VITE_API_BASE_URL` — page/component code stays unchanged.
+Then edit:
 
-**Demo accounts** (mock auth): `demo@depalert.ai / demo1234` (Standard) ·
-`viewer@depalert.ai / viewer1234` (Authorized Viewer).
+- `backend/.env` → set `MONGODB_URI` to your MongoDB cluster URL, and set `JWT_SECRET` and
+  `ML_SERVICE_API_KEY` to random strings.
+- `ml-service/.env` → set `ML_SERVICE_API_KEY` to the **same** value as the backend, and
+  set `GROQ_API_KEY` to enable LLM scoring.
+- `frontend/.env` → keep `http://localhost:5000/api` for local development.
+
+### 2) ML service (Python)
+
+```bash
+cd ml-service
+python -m venv .venv
+.venv\Scripts\activate          # Windows  (source .venv/bin/activate on Linux/macOS)
+pip install -r requirements.txt
+uvicorn app.main:app --port 8000
+```
+
+Health check: `GET http://localhost:8000/health` → `{ "ok": true, ... }`
+
+### 3) Backend (Node.js)
+
+```bash
+cd backend
+npm install
+npm run seed    # optional — creates the demo accounts and sample history
+npm run dev     # http://localhost:5000/api
+```
+
+**Demo accounts** (created by `npm run seed`):
+
+| Account | Password | Role |
+|---|---|---|
+| `demo@depalert.ai` | `demo1234` | Standard |
+| `viewer@depalert.ai` | `viewer1234` | Authorized Viewer (authorized on the demo user) |
+
+### 4) Frontend (React)
+
+```bash
+cd frontend
+npm install
+npm run dev     # http://localhost:5173
+```
+
+### 5) End-to-end API verification
+
+```bash
+cd backend
+node src/e2e.test.mjs
+# uses an in-memory MongoDB; to target a specific cluster:
+# E2E_MONGODB_URI=<uri> node src/e2e.test.mjs
+```
 
 ---
 
-## 10. Future Implementation Steps
+## 12. MongoDB Configuration
 
-1. Phase 1 frontend per §7, verified against SRS use-case flows UC-1..UC-8.
-2. Phase 2 backend + Python service; train the classifier on ethically sourced mental-health
-   text datasets (CO-3); keep `MODEL_VERSION` artifacts out of git.
-3. Phase 3 persistence + isolation.
-4. Proposal-level expansion (post-FYP): direct social-media API ingestion, clinician/professional
-   roles & dashboards, admin console, email/SMS alerts, report export (PDF/CSV/JSON, HL7 FHIR),
-   multi-language NLP, differential privacy, EMR integration.
+1. Create a free **MongoDB Atlas** M0 cluster (or run `mongod` locally).
+2. Create a database user and allow your IP address in Network Access.
+3. Copy the connection string and paste it into `backend/.env` as `MONGODB_URI`,
+   including the database name, e.g.
+   `mongodb+srv://<user>:<password>@<cluster>.mongodb.net/depressionalert_ai`.
+4. No collections need to be created manually — Mongoose creates them on first write.
+   Run `npm run seed` to populate demo data.
 
-## 11. Deployment Considerations (free-tier friendly)
+> **Note:** on networks that block DNS `TXT` lookups, `mongodb+srv://` URIs fail with
+> `queryTxt ETIMEOUT`. Use the equivalent standard multi-host form:
+> `mongodb://<user>:<password>@host0:27017,host1:27017,host2:27017/<db>?tls=true&authSource=admin&retryWrites=true&w=majority`
 
-No technology beyond the PDFs is required; each tier maps cleanly to a free host:
+---
 
-- **Frontend** → static `vite build` output → any free static host (e.g. Vercel/Netlify/GitHub Pages). Set `VITE_API_BASE_URL` to the deployed API.
-- **Backend** → Node web service on a free tier (e.g. Render/Railway); HTTPS provided by the platform satisfies SEC-1.
-- **ML service** → small Python web service on a free tier; keep it private — reachable only by the backend via `ML_SERVICE_API_KEY`.
-- **MongoDB** → Atlas M0 free cluster; connection string goes in `MONGODB_URI`.
+## 13. Usage Instructions
 
-Config is fully env-driven (no hardcoded URLs/secrets), so each tier deploys independently.
+1. Open the frontend, create an account (consent checkbox required), or log in with a
+   demo account.
+2. From the Dashboard choose **New Evaluation** → paste a social-media post or upload a
+   CSV (one post per row; a `text`/`content`/`post` column is detected automatically).
+3. View the result: risk gauge, level, sentiment, detected linguistic indicators.
+4. Track **History** and **Behavioural Trends** as more evaluations accumulate.
+5. A **High** result raises an alert (modal + Alerts page) with crisis-support resources —
+   *Take a 30-min break* starts the detox timer; *Dismiss* closes it.
+6. Manage consent, profile, password and preventive settings under **Privacy & Profile**
+   and **Settings**.
+
+---
+
+## 14. Deployment
+
+Each tier deploys independently; configuration is fully env-driven.
+
+| Tier | Hosting | Notes |
+|---|---|---|
+| Frontend | Any static host (Vercel, Netlify, GitHub Pages) | `npm run build`; set `VITE_API_BASE_URL` to the deployed API |
+| Backend | Node web service (Render, Railway, etc.) | Platform HTTPS satisfies TLS requirements; set all `backend/.env` vars |
+| ML service | Python web service (Render, Railway, etc.) | Keep it private — reachable only by the backend via `ML_SERVICE_API_KEY` |
+| MongoDB | Atlas M0 cluster | Connection string in `MONGODB_URI` |
+
+---
+
+## 15. Security Considerations
+
+- **Authentication:** JWT session tokens; expired/invalid tokens are rejected server-side
+  and cleared client-side.
+- **Passwords:** bcrypt salted one-way hashing; hashes are never serialized to the client.
+- **Consent enforcement:** the consent middleware blocks every text/CSV processing request
+  while consent is revoked; grants and revocations are audit-logged.
+- **Data isolation:** all queries are scoped to the authenticated `userId`; Authorized
+  Viewers see results only for accounts on their authorized list — never raw submissions.
+- **Upload safety:** `.csv` extension + MIME validation, size limit, row-level
+  empty/malformed/duplicate/oversized rejection; files are deleted after parsing.
+- **Transport:** HTTPS/TLS 1.2+ is provided by the hosting platform in deployment.
+- **Internal API:** the Python service accepts only requests carrying the shared
+  `X-API-Key`.
+- **Secrets:** all credentials live in `.env` files, which are git-ignored.
+
+---
+
+## 16. Scope & Exclusions
+
+The system provides supportive early-awareness insight only. It does **not** perform
+clinical diagnosis, automated contact with monitored individuals, image/video analysis,
+suicide-risk prediction, biometric/wearable data collection, or treatment recommendations.
+Direct social-media API ingestion, clinician dashboards, admin consoles, report export and
+multi-language NLP are documented as future work.
+
+---
+
+## 17. Conclusion
+
+DepressionAlert AI delivers a complete, consent-based, three-tier web application:
+a React SPA for submission and visualization, a Node.js/Express REST API enforcing
+authentication, consent and data isolation, a protected Python NLP/ML service producing
+traceable risk scores, and MongoDB persistence for users, posts, processed text, results,
+behavioural patterns and alerts. Together they fulfil all functional requirements —
+registration through crisis-resource alerting — while keeping the deployment footprint
+simple enough to run entirely on free-tier hosting.

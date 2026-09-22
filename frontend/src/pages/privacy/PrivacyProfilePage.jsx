@@ -6,7 +6,7 @@ import { Card, PageHeader, FormField, AlertBox, Toggle, Tag } from '../../compon
 import Modal from '../../components/common/Modal';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { updateProfile, updateConsent } from '../../services/api';
+import { updateProfile, updateConsent, changePassword } from '../../services/api';
 import { initials, formatDate } from '../../utils/format';
 
 export default function PrivacyProfilePage() {
@@ -42,11 +42,15 @@ export default function PrivacyProfilePage() {
     setErrors(errs);
     if (Object.keys(errs).length) return;
     setBusyPw(true);
-    setTimeout(() => {
-      setBusyPw(false);
+    try {
+      await changePassword(pw.current, pw.next);
       setPw({ current: '', next: '', confirm: '' });
       toast.success('Password changed.');
-    }, 600);
+    } catch (err) {
+      setErrors({ current: err.message });
+    } finally {
+      setBusyPw(false);
+    }
   };
 
   const toggleConsent = async (grant) => {

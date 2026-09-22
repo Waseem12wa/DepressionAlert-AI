@@ -7,8 +7,9 @@ import * as api from '../../services/api';
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ password: '', confirm: '' });
+  const [form, setForm] = useState({ token: '', password: '', confirm: '' });
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -16,16 +17,23 @@ export default function ResetPasswordPage() {
 
   const submit = async (e) => {
     e.preventDefault();
+    setServerError('');
     const errs = {};
+    if (!form.token.trim()) errs.token = 'Enter the reset code from your email.';
     if (form.password.length < 8) errs.password = 'Use at least 8 characters.';
     if (form.confirm !== form.password) errs.confirm = 'Passwords do not match.';
     setErrors(errs);
     if (Object.keys(errs).length) return;
     setBusy(true);
-    await api.resetPassword();
-    setBusy(false);
-    setDone(true);
-    setTimeout(() => navigate('/login'), 1800);
+    try {
+      await api.resetPassword(form.token.trim(), form.password);
+      setDone(true);
+      setTimeout(() => navigate('/login'), 1800);
+    } catch (err) {
+      setServerError(err.message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -34,6 +42,11 @@ export default function ResetPasswordPage() {
         <AlertBox type="success">Password updated. Redirecting you to login…</AlertBox>
       ) : (
         <form onSubmit={submit} noValidate>
+          {serverError && <div className="mb-2"><AlertBox type="danger">{serverError}</AlertBox></div>}
+          <FormField label="Reset code" error={errors.token}>
+            <input value={form.token} onChange={set('token')}
+              placeholder="Paste the code from your email" className={errors.token ? 'invalid' : ''} />
+          </FormField>
           <PasswordInput label="New password" value={form.password} onChange={set('password')} error={errors.password} />
           <FormField label="Confirm new password" error={errors.confirm}>
             <input type="password" value={form.confirm} onChange={set('confirm')}
