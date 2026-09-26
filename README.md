@@ -1,12 +1,5 @@
 # DepressionAlert AI
 
-> Final Year Project — Department of Computer Science
-> COMSATS University Islamabad, Abbottabad Campus
-> BS Computer Science (2023–2027)
-
-**Team:** Muhammad Salahudin Khan (SP23-BCS-135) · Muhammad Azan (SP23-BCS-116)
-**Supervisor:** Ms. Sara Shafique
-
 ---
 
 ## 1. Project Overview
